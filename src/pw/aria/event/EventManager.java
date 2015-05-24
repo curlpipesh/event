@@ -1,6 +1,8 @@
 package pw.aria.event;
 
+import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -27,6 +29,11 @@ public class EventManager {
      * default, this is a {@link java.util.concurrent.ConcurrentLinkedQueue}.
      */
     private static final Queue<Listener<?>> listeners = new ConcurrentLinkedQueue<>();
+
+    /**
+     * Stores times for event firing. Used for profiling.
+     */
+    private static final Map<Class<?>, Long> eventFireTimes = new ConcurrentHashMap<>();
 
     /**
      * Registers an arbitrary number of {@link pw.aria.event.Listener}s.
@@ -63,6 +70,7 @@ public class EventManager {
      */
     @SuppressWarnings("unchecked")
     public static synchronized <T> T push(T object) {
+        long start = System.nanoTime();
         for(Listener e : listeners) {
             if(e.getType().equals(object.getClass())) {
                 e.event(object);
@@ -71,8 +79,8 @@ public class EventManager {
                 return object;
             }
         }
-        /*listeners.stream().filter(l -> l.getType().equals(object.getClass()))
-                .forEach(l -> ((Listener<T>) l).event(object));*/
+        long end = System.nanoTime();
+        eventFireTimes.put(object.getClass(), end - start);
         return object;
     }
 
