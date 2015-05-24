@@ -110,4 +110,8 @@ public class EventManager {
     public static synchronized boolean getPushState() {
         return allowPush.get();
     }
+
+    public static synchronized Map<Class<?>, Long> getEventFireTimes() {
+        return eventFireTimes;
+    }
 }
