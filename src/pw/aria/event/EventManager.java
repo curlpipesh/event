@@ -76,9 +76,10 @@ public class EventManager {
                 e.event(object);
             }
             if(!allowPush.get()) {
-                return object;
+                break;
             }
         }
+
         long end = System.nanoTime();
         eventFireTimes.put(object.getClass(), end - start);
         return object;
